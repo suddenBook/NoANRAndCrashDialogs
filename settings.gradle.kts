@@ -1,20 +1,19 @@
-rootProject.name = "NoANRAndCrashDialogs"
-
 pluginManagement {
     repositories {
         google()
-        gradlePluginPortal()
         mavenCentral()
+        gradlePluginPortal()
     }
 }
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        mavenLocal()
         google()
         mavenCentral()
+        maven { url = uri("https://jitpack.io") }
     }
 }
 
+rootProject.name = "NoANRAndCrashDialogs"
 include(":app")
