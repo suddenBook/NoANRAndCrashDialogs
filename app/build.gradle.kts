@@ -61,5 +61,5 @@ android {
 dependencies {
     implementation(libs.libxposed.api)
     implementation(libs.libxposed.service)
-    implementation(libs.libxposed.interface)
+    implementation(libs.libxposed.`interface`)
 }
