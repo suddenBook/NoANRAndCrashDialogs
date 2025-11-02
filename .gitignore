@@ -6,3 +6,8 @@
 /local.properties
 build
 app/.cxx
+# Keystore file
+*.keystore
+
+# Local properties with credentials
+gradle.properties
