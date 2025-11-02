@@ -6,8 +6,6 @@ import android.os.Handler
 import io.github.libxposed.api.XposedInterface
 import io.github.libxposed.api.XposedModule
 import io.github.libxposed.api.XposedModuleInterface
-import io.github.libxposed.api.annotations.BeforeInvocation
-import io.github.libxposed.api.annotations.XposedHooker
 
 @SuppressLint("PrivateApi")
 object NoANRDialogsHooker {
@@ -29,21 +27,19 @@ object NoANRDialogsHooker {
         }
     }
 
-    @XposedHooker
     private class ANRDialogShowingHooker : XposedInterface.Hooker {
 
         companion object {
             @Suppress("unused")
             @JvmStatic
-            @BeforeInvocation
-            fun beforeShowAnrDialogs(
+            fun before(
                 callback: XposedInterface.BeforeHookCallback
-            ): ANRDialogShowingHooker {
+            ): Any? {
                 try {
                     val controller = callback.thisObject
                     if (controller == null) {
                         callback.returnAndSkip(null)
-                        return ANRDialogShowingHooker()
+                        return null
                     }
 
                     val isSilentANR: Boolean? = controller
@@ -52,7 +48,7 @@ object NoANRDialogsHooker {
                         ?.invokeMethod("isSilentAnr")
                     if (isSilentANR == null) {
                         callback.returnAndSkip(null)
-                        return ANRDialogShowingHooker()
+                        return null
                     }
 
                     val contexts: List<Context>? = controller.invokeMethod(
@@ -62,27 +58,27 @@ object NoANRDialogsHooker {
                     )
                     if (contexts.isNullOrEmpty()) {
                         callback.returnAndSkip(null)
-                        return ANRDialogShowingHooker()
+                        return null
                     }
 
                     val service: Any? = controller.getField("mService")
                     if (service == null) {
                         callback.returnAndSkip(null)
-                        return ANRDialogShowingHooker()
+                        return null
                     }
 
                     val data = callback.args[0]
                     val classLoader = data.javaClass.classLoader
                     if (classLoader == null) {
                         callback.returnAndSkip(null)
-                        return ANRDialogShowingHooker()
+                        return null
                     }
 
                     val dialogClass =
                         classLoader.loadClass("com.android.server.am.AppNotRespondingDialog")
                     if (dialogClass == null) {
                         callback.returnAndSkip(null)
-                        return ANRDialogShowingHooker()
+                        return null
                     }
 
                     val activityManagerServiceClass = classLoader
@@ -101,13 +97,13 @@ object NoANRDialogsHooker {
                         )
                         if (dialog == null) {
                             callback.returnAndSkip(null)
-                            return ANRDialogShowingHooker()
+                            return null
                         }
 
                         val handler: Handler? = dialog.getField("mHandler")
                         if (handler == null) {
                             callback.returnAndSkip(null)
-                            return ANRDialogShowingHooker()
+                            return null
                         }
                         xposedModule?.log("[NoANRAndCrashDialogs] Hide ANR dialog")
                         handler.obtainMessage(WAIT_COMMAND_CODE).sendToTarget()
@@ -116,8 +112,12 @@ object NoANRDialogsHooker {
                 } catch (e: Throwable) {
                     callback.returnAndSkip(null)
                 }
-                return ANRDialogShowingHooker()
+                return null
             }
+
+            // @JvmStatic
+            // fun after(callback: XposedInterface.AfterHookCallback, context: Any?) { ... }
         }
     }
 }
+

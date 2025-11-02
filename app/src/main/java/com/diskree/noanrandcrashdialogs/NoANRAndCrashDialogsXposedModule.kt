@@ -11,7 +11,7 @@ class NoANRAndCrashDialogsXposedModule(
 
     override fun onSystemServerLoaded(param: XposedModuleInterface.SystemServerLoadedParam) {
         super.onSystemServerLoaded(param)
-
+	log("[NoANRAndCrashDialogs] Module initialized on system_server")
         NoANRDialogsHooker.hook(param, this@NoANRAndCrashDialogsXposedModule)
         NoCrashDialogsHooker.hook(param, this@NoANRAndCrashDialogsXposedModule)
     }
